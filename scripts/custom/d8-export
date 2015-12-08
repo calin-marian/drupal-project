@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+upsearch () {
+  slashes=${PWD//[^\/]/}
+  PROJECT_ROOT="$PWD"
+  for (( n=${#slashes}; n>0; --n ))
+  do
+    test -e "$PROJECT_ROOT/$1" && return
+    PROJECT_ROOT="$PROJECT_ROOT/.."
+  done
+}
+
+CUR_DIRECTORY="$PWD"
+upsearch 'composer.json'
+
+if [ ! -f "${PROJECT_ROOT}/composer.json" ]; then
+  echo "composer.json file not found, please run the script from within the project."
+  exit 1
+fi
+
+cd "${PROJECT_ROOT}"
+
+cd web &&
+drush config-export &&
+git add ../config
+if ! git diff-index --cached --quiet HEAD --ignore-submodules --
+then
+  git commit
+fi
+
+
+cd "${CUR_DIRECTORY}"

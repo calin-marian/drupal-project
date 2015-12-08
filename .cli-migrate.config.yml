@@ -1,0 +1,2 @@
+scripts_folder: cli-migrate
+state_file: .cli-migrate.state.yml

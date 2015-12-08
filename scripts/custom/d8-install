@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+# Use > 1 to consume two arguments per pass in the loop (e.g. each
+# argument has a corresponding value to go with it).
+# Use > 0 to consume one or more arguments per pass in the loop (e.g.
+# some arguments don't have a corresponding value to go with it such
+# as in the --default example).
+# note: if this is set to > 0 the /etc/hosts part is not recognized ( may be a bug )
+while [[ $# > 1 ]]
+do
+key="$1"
+
+case $key in
+    -u|--user)
+    USERNAME="$2"
+    shift # past argument
+    ;;
+    -p|--password)
+    PASSWORD="$2"
+    shift # past argument
+    ;;
+    -d|--database)
+    DATABASE="$2"
+    shift # past argument
+    ;;
+    -a|--account-pass)
+    ACCOUNT_PASS="$2"
+    shift # past argument
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+shift # past argument or value
+done
+
+upsearch () {
+  slashes=${PWD//[^\/]/}
+  PROJECT_ROOT="$PWD"
+  for (( n=${#slashes}; n>0; --n ))
+  do
+    test -e "$PROJECT_ROOT/$1" && return
+    PROJECT_ROOT="$PROJECT_ROOT/.."
+  done
+}
+
+CUR_DIRECTORY="$PWD"
+upsearch 'composer.json'
+
+if [ ! -f "${PROJECT_ROOT}/composer.json" ]; then
+  echo "composer.json file not found, please run the script from within the project."
+  exit 1
+fi
+
+if [ -z "${USERNAME}" ]; then
+  echo "Missing mysql user parameter, provide it with the -u or the --user argument name."
+  exit 1
+fi
+if [ -z "${PASSWORD}" ]; then
+  echo "Missing mysql password parameter, provide it with the -p or the --password argument name."
+  exit 1
+fi
+if [ -z "${DATABASE}" ]; then
+  echo "Missing mysql database parameter, provide it with the -d or the --database argument name."
+  exit 1
+fi
+
+
+cd "${PROJECT_ROOT}"
+composer install &&
+cd web &&
+chmod +w sites/default &&
+chmod +w sites/default/settings.php &&
+rm -f sites/default/settings.php &&
+drush site-install -y standard --db-url=mysql://"${USERNAME}":"${PASSWORD}"@127.0.0.1/"${DATABASE}" --account-mail=dadmin@dreamproduction.com --account-name=dpadmin --account-pass=admin --site-name="Temp site name" &&
+chmod +w sites/default &&
+sed -i "s/^\$config_directories.*/\$config_directories['sync'] = '\.\/\.\.\/config\/sync';/g" sites/default/settings.php
+chmod -w sites/default
+chmod -w sites/default/settings.php
+cd "${CUR_DIRECTORY}"
+

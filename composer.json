@@ -18,6 +18,7 @@
     "require": {
         "composer/installers": "^1.0.20",
         "cweagans/composer-patches": "~1.0",
+        "dreamproduction/cli-migrate": "dev-master",
         "drupal/core": "8.0.*",
         "drush/drush": "~8.0",
         "drupal/console": "~0.9"
@@ -43,6 +44,10 @@
             "web/profiles/contrib/{$name}": ["type:drupal-profile"],
             "web/themes/contrib/{$name}": ["type:drupal-theme"],
             "drush/contrib/{$name}": ["type:drupal-drush"]
-        }
+        },
+        "patches-file": "composer.patches.json"
+    },
+    "config": {
+        "preferred-install": "dist"
     }
 }
