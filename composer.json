@@ -26,7 +26,12 @@
         "dreamproduction/cli-migrate": "dev-master",
         "drupal/core": "~8.0",
         "drush/drush": "~8.0",
-        "drupal/console": "~1.0"
+        "drupal/console": "~1.0",
+        "drupal/security_review": "1.x-dev",
+        "roave/security-advisories": "dev-master",
+        "drupal-composer/drupal-security-advisories": "8.0.x-dev",
+        "drupal/lightning": "^1.0",
+        "drupal/metatag": "^1.0"
     },
     "require-dev": {
         "geerlingguy/drupal-vm": "^3.1",
